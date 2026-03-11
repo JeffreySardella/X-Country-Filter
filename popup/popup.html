@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>X Country Filter</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup">
+    <header class="header">
+      <div class="header-left">
+        <span class="logo">🌍</span>
+        <h1>X Country Filter</h1>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="enableToggle" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </header>
+
+    <section class="settings-section">
+      <div class="setting-row">
+        <label for="modeSelect">Mode:</label>
+        <select id="modeSelect">
+          <option value="blocklist">Blocklist</option>
+          <option value="allowlist">Allowlist</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <label for="displaySelect">Display:</label>
+        <select id="displaySelect">
+          <option value="hidden">Hidden</option>
+          <option value="collapsed">Collapsed</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="countries-section">
+      <h2>Countries</h2>
+      <input type="text" id="countrySearch" placeholder="Search countries..." class="search-input">
+      <div id="countryList" class="country-list"></div>
+    </section>
+
+    <section class="options-section">
+      <label class="checkbox-row">
+        <input type="checkbox" id="hideUnknown">
+        <span>Hide unknown accounts</span>
+      </label>
+      <label class="checkbox-row">
+        <input type="checkbox" id="useApiFallback">
+        <span>Use online lookup for unrecognized locations</span>
+      </label>
+    </section>
+
+    <section class="stats-section">
+      <span id="statsText">Filtered: 0 posts today</span>
+    </section>
+
+    <footer class="footer">
+      <button id="resetBtn" class="btn-reset">Reset to Defaults</button>
+      <button id="helpBtn" class="btn-help" title="How to Use">?</button>
+    </footer>
+  </div>
+
+  <script src="popup.js" type="module"></script>
+</body>
+</html>
