@@ -103,7 +103,7 @@ function onSearchInput(e) { renderCountryList(e.target.value); }
 
 async function onReset() {
   if (!confirm("Reset all settings? Your country preferences will be cleared and onboarding will re-open.")) return;
-  await chrome.storage.local.remove(["onboardingComplete", "settings", "stats"]);
+  await chrome.storage.local.remove(["onboardingComplete", "settings", "stats", "userCache"]);
   window.close();
 }
 

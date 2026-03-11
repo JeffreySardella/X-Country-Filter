@@ -39,6 +39,8 @@ function renderCountryList(filter = "") {
 
     const cb = document.createElement("input");
     cb.type = "checkbox";
+    cb.id = "country-" + c.code;
+    cb.name = "country-" + c.code;
     cb.value = c.code;
     cb.checked = state.countries.includes(c.code);
     cb.addEventListener("change", (e) => {

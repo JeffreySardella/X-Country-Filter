@@ -16,14 +16,14 @@
       </div>
       <div class="step-content">
         <label class="radio-card selected" data-value="blocklist">
-          <input type="radio" name="mode" value="blocklist" checked>
+          <input type="radio" name="mode" id="mode-blocklist" value="blocklist" checked>
           <div class="radio-card-content">
             <h3>Blocklist</h3>
             <p>Hide posts from countries you select. Everything else is shown.</p>
           </div>
         </label>
         <label class="radio-card" data-value="allowlist">
-          <input type="radio" name="mode" value="allowlist">
+          <input type="radio" name="mode" id="mode-allowlist" value="allowlist">
           <div class="radio-card-content">
             <h3>Allowlist</h3>
             <p>Only show posts from countries you select. Everything else is hidden.</p>
@@ -64,17 +64,17 @@
           <h3>Unknown Accounts</h3>
           <p>Some accounts don't list a location. What should we do with posts from accounts we can't identify?</p>
           <label class="radio-card selected" data-value="show">
-            <input type="radio" name="unknown" value="show" checked>
+            <input type="radio" name="unknown" id="unknown-show" value="show" checked>
             <div class="radio-card-content">
               <h3>Show them (recommended)</h3>
               <p>Unknown accounts are left visible in your feed.</p>
             </div>
           </label>
           <label class="radio-card" data-value="hide">
-            <input type="radio" name="unknown" value="hide">
+            <input type="radio" name="unknown" id="unknown-hide" value="hide">
             <div class="radio-card-content">
               <h3>Hide them</h3>
-              <p>Posts from unidentified accounts are also filtered.</p>
+              <p>Posts from unidentified accounts are also filtered. Many accounts don't set a location, so this may filter a lot of posts.</p>
             </div>
           </label>
         </div>
@@ -82,14 +82,14 @@
           <h3>Display Mode</h3>
           <p>How should filtered posts appear?</p>
           <label class="radio-card selected" data-value="hidden">
-            <input type="radio" name="display" value="hidden" checked>
+            <input type="radio" name="display" id="display-hidden" value="hidden" checked>
             <div class="radio-card-content">
               <h3>Completely hidden</h3>
               <p>Filtered posts are removed entirely — as if they never existed.</p>
             </div>
           </label>
           <label class="radio-card" data-value="collapsed">
-            <input type="radio" name="display" value="collapsed">
+            <input type="radio" name="display" id="display-collapsed" value="collapsed">
             <div class="radio-card-content">
               <h3>Collapsed with reveal</h3>
               <p>A small bar replaces filtered posts. Click to reveal them.</p>

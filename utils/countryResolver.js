@@ -1,6 +1,28 @@
 import { COUNTRY_BY_NAME, LANGUAGE_TO_COUNTRY } from "./countries.js";
 import { CITY_TO_COUNTRY } from "./cityMap.js";
 
+// X's "Account based in" regions → most likely country code
+const REGION_TO_COUNTRY = new Map([
+  ["south asia", "IN"],
+  ["southeast asia", "SG"],
+  ["east asia", "JP"],
+  ["middle east", "AE"],
+  ["north africa", "EG"],
+  ["sub-saharan africa", "NG"],
+  ["west africa", "NG"],
+  ["east africa", "KE"],
+  ["southern africa", "ZA"],
+  ["western europe", "DE"],
+  ["eastern europe", "PL"],
+  ["northern europe", "SE"],
+  ["southern europe", "IT"],
+  ["central america", "MX"],
+  ["south america", "BR"],
+  ["caribbean", "JM"],
+  ["oceania", "AU"],
+  ["central asia", "KZ"],
+]);
+
 export function resolveCountry(location, lang) {
   const raw = (location ?? "").trim();
   if (!raw && !lang) return "unknown";
@@ -19,6 +41,11 @@ export function resolveCountry(location, lang) {
     .trim();
 
   if (!normalized && !lang) return "unknown";
+
+  // Step 2b: X region match ("Account based in" data)
+  if (normalized && REGION_TO_COUNTRY.has(normalized)) {
+    return REGION_TO_COUNTRY.get(normalized);
+  }
 
   // Step 3: Exact country name match
   if (normalized && COUNTRY_BY_NAME.has(normalized)) {
