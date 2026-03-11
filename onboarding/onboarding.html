@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>X Country Filter — Setup</title>
+  <link rel="stylesheet" href="onboarding.css">
+</head>
+<body>
+  <div class="onboarding">
+    <div class="step" id="step1">
+      <div class="step-header">
+        <span class="step-icon">🌍</span>
+        <h1>Welcome to X Country Filter</h1>
+        <p class="step-label">Step 1 of 4 — Choose your filter mode</p>
+      </div>
+      <div class="step-content">
+        <label class="radio-card selected" data-value="blocklist">
+          <input type="radio" name="mode" value="blocklist" checked>
+          <div class="radio-card-content">
+            <h3>Blocklist</h3>
+            <p>Hide posts from countries you select. Everything else is shown.</p>
+          </div>
+        </label>
+        <label class="radio-card" data-value="allowlist">
+          <input type="radio" name="mode" value="allowlist">
+          <div class="radio-card-content">
+            <h3>Allowlist</h3>
+            <p>Only show posts from countries you select. Everything else is hidden.</p>
+          </div>
+        </label>
+      </div>
+      <div class="step-footer">
+        <div></div>
+        <button class="btn-next" id="nextBtn1">Next →</button>
+      </div>
+    </div>
+
+    <div class="step hidden" id="step2">
+      <div class="step-header">
+        <span class="step-icon">🌍</span>
+        <h1>Select Your Countries</h1>
+        <p class="step-label">Step 2 of 4 — Choose which countries to include</p>
+        <p class="step-hint" id="modeHint"></p>
+      </div>
+      <div class="step-content">
+        <input type="text" id="countrySearch" placeholder="Search countries..." class="search-input">
+        <div id="countryList" class="country-grid"></div>
+      </div>
+      <div class="step-footer">
+        <button class="btn-back" id="backBtn2">← Back</button>
+        <button class="btn-next" id="nextBtn2">Next →</button>
+      </div>
+    </div>
+
+    <div class="step hidden" id="step3">
+      <div class="step-header">
+        <span class="step-icon">⚙️</span>
+        <h1>Preferences</h1>
+        <p class="step-label">Step 3 of 4 — Fine-tune your experience</p>
+      </div>
+      <div class="step-content">
+        <div class="pref-group">
+          <h3>Unknown Accounts</h3>
+          <p>Some accounts don't list a location. What should we do with posts from accounts we can't identify?</p>
+          <label class="radio-card selected" data-value="show">
+            <input type="radio" name="unknown" value="show" checked>
+            <div class="radio-card-content">
+              <h3>Show them (recommended)</h3>
+              <p>Unknown accounts are left visible in your feed.</p>
+            </div>
+          </label>
+          <label class="radio-card" data-value="hide">
+            <input type="radio" name="unknown" value="hide">
+            <div class="radio-card-content">
+              <h3>Hide them</h3>
+              <p>Posts from unidentified accounts are also filtered.</p>
+            </div>
+          </label>
+        </div>
+        <div class="pref-group">
+          <h3>Display Mode</h3>
+          <p>How should filtered posts appear?</p>
+          <label class="radio-card selected" data-value="hidden">
+            <input type="radio" name="display" value="hidden" checked>
+            <div class="radio-card-content">
+              <h3>Completely hidden</h3>
+              <p>Filtered posts are removed entirely — as if they never existed.</p>
+            </div>
+          </label>
+          <label class="radio-card" data-value="collapsed">
+            <input type="radio" name="display" value="collapsed">
+            <div class="radio-card-content">
+              <h3>Collapsed with reveal</h3>
+              <p>A small bar replaces filtered posts. Click to reveal them.</p>
+            </div>
+          </label>
+        </div>
+      </div>
+      <div class="step-footer">
+        <button class="btn-back" id="backBtn3">← Back</button>
+        <button class="btn-next" id="nextBtn3">Next →</button>
+      </div>
+    </div>
+
+    <div class="step hidden" id="step4">
+      <div class="step-header">
+        <span class="step-icon">✅</span>
+        <h1>You're All Set!</h1>
+        <p class="step-label">Step 4 of 4 — Filtering is now active</p>
+      </div>
+      <div class="step-content done-content">
+        <p>Your preferences have been saved. The extension will start filtering posts the next time you visit X.</p>
+        <p>You can change your settings anytime by clicking the extension icon in your toolbar.</p>
+      </div>
+      <div class="step-footer done-footer">
+        <button class="btn-secondary" id="guideBtn">📖 How It Works</button>
+        <button class="btn-next" id="startBtn">Start Browsing →</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="onboarding.js" type="module"></script>
+</body>
+</html>
