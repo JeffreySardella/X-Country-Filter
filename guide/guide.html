@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>X Country Filter — How to Use</title>
+  <link rel="stylesheet" href="guide.css">
+</head>
+<body>
+  <div class="guide">
+    <header>
+      <span class="logo">🌍</span>
+      <h1>X Country Filter — How to Use</h1>
+    </header>
+
+    <section>
+      <h2>What X Country Filter Does</h2>
+      <p>X Country Filter lets you control whose posts you see on X (Twitter) based on the geographic origin of their account. It filters posts in your feed, replies, search results, notifications, and suggestions.</p>
+      <p><strong>Privacy first:</strong> All processing happens locally in your browser. No data is ever sent to external servers (unless you opt into the online location lookup).</p>
+    </section>
+
+    <section>
+      <h2>Filter Modes</h2>
+      <div class="mode-card">
+        <h3>Blocklist Mode</h3>
+        <p>Select countries you want to <strong>hide</strong>. Posts from accounts in those countries are filtered out. Everything else is shown normally.</p>
+        <p class="tip">Best for: Hiding spam from specific regions while keeping your feed mostly unchanged.</p>
+      </div>
+      <div class="mode-card">
+        <h3>Allowlist Mode</h3>
+        <p>Select countries you want to <strong>keep</strong>. Only posts from accounts in those countries are shown. Everything else is hidden.</p>
+        <p class="tip">Best for: Creating a focused feed from trusted regions. More aggressive — use with care.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>How Country Detection Works</h2>
+      <p>The extension reads profile information that X already loads for each account and uses several methods to determine the account's country:</p>
+      <ol>
+        <li><strong>Flag emoji</strong> — If the profile location contains a country flag emoji (e.g. 🇧🇷), the country is identified from it.</li>
+        <li><strong>Country name</strong> — The location text is matched against known country names and common aliases (e.g. "USA", "America", "UK").</li>
+        <li><strong>City name</strong> — Major world cities are mapped to their countries (e.g. "Lagos" → Nigeria, "Mumbai" → India).</li>
+        <li><strong>Partial match</strong> — If the location text contains a country name anywhere (e.g. "Living in Brazil"), it's matched.</li>
+        <li><strong>Language</strong> — For languages spoken in only one country (e.g. Japanese → Japan), the account language is used as a signal.</li>
+        <li><strong>Online lookup (optional)</strong> — If enabled, unrecognized locations are sent to OpenStreetMap's Nominatim service for resolution.</li>
+      </ol>
+      <p class="tip">Accounts with no location set are labeled "unknown." You can choose to show or hide them in settings.</p>
+    </section>
+
+    <section>
+      <h2>Display Modes</h2>
+      <div class="mode-card">
+        <h3>Completely Hidden</h3>
+        <p>Filtered posts are removed entirely from the page. You won't see any trace of them.</p>
+      </div>
+      <div class="mode-card">
+        <h3>Collapsed with Reveal</h3>
+        <p>A small bar replaces each filtered post showing the detected country. Click "Show" to reveal the original post.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Changing Your Settings</h2>
+      <p>Click the <strong>X Country Filter</strong> icon in your browser toolbar to open the settings popup. From there you can:</p>
+      <ul>
+        <li><strong>Toggle ON/OFF</strong> — Enable or disable filtering instantly.</li>
+        <li><strong>Switch mode</strong> — Change between Blocklist and Allowlist.</li>
+        <li><strong>Change display</strong> — Switch between Hidden and Collapsed.</li>
+        <li><strong>Select countries</strong> — Search and check/uncheck countries.</li>
+        <li><strong>Hide unknowns</strong> — Choose whether to filter accounts with no detected country.</li>
+        <li><strong>Online lookup</strong> — Enable the Nominatim API for better detection of ambiguous locations.</li>
+        <li><strong>Reset</strong> — Clear all settings and restart onboarding.</li>
+      </ul>
+      <p>Changes take effect immediately — no page refresh needed.</p>
+    </section>
+
+    <section>
+      <h2>Tips & Limitations</h2>
+      <ul>
+        <li>Detection works best on accounts that have a location set in their profile.</li>
+        <li>Accounts with no location or a fake location may not be accurately detected.</li>
+        <li>The user cache refreshes every 7 days. If someone updates their location, the change will be picked up after their cache entry expires.</li>
+        <li>If X updates their internal code, the extension may need an update to keep working.</li>
+        <li>The online lookup (Nominatim) sends location strings to an external service. It's off by default for privacy.</li>
+      </ul>
+    </section>
+
+    <footer>
+      <p>X Country Filter v1.0.0</p>
+    </footer>
+  </div>
+</body>
+</html>

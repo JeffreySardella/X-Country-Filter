@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd:*)",
+      "Bash(cd /c/Users/Jeff/Documents/Github_new/X-Country-Filter && gh repo create X-Country-Filter-Advanced --private 2>&1)",
+      "Bash(cd /c/Users/Jeff/Documents/Github_new/X-Country-Filter && git push https://github.com/JeffreySardella/X-Country-Filter-Advanced.git feat/enhanced-filtering-and-lookups:main 2>&1)",
+      "Bash(cd /c/Users/Jeff/Documents/Github_new/X-Country-Filter && git checkout main && git pull origin main 2>&1)",
+      "Bash(cd /c/Users/Jeff/Documents/Github_new/X-Country-Filter && git revert aabe38f --no-commit 2>&1 && git revert 9c75ba5 --no-commit 2>&1)",
+      "Bash(cd /c/Users/Jeff/Documents/Github_new/X-Country-Filter && git revert -m 1 aabe38f --no-edit 2>&1)",
+      "Bash(cd /c/Users/Jeff/Documents/Github_new/X-Country-Filter && git merge safe-improvements --no-edit 2>&1)",
+      "Bash(cd /c/Users/Jeff/Documents/Github_new/X-Country-Filter && git push origin main 2>&1)",
+      "Bash(cd /c/Users/Jeff/Documents/Github_new/X-Country-Filter && git push origin --delete feat/enhanced-filtering-and-lookups 2>&1)",
+      "Bash(cd /c/Users/Jeff/Documents/Github_new/X-Country-Filter && git push origin --delete safe-improvements 2>&1)",
+      "Bash(cd /c/Users/Jeff/Documents/Github_new/X-Country-Filter && git push origin main --force 2>&1)",
+      "Bash(cd /c/Users/Jeff/Documents/Github_new/X-Country-Filter && git mv fetchHook.js pageAnalyzer.js 2>&1)"
+    ]
+  }
+}
