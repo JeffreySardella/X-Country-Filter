@@ -162,6 +162,45 @@ h1 { font-size: 15px; font-weight: 700; }
   cursor: pointer;
 }
 
+.delay-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0 2px;
+}
+
+.delay-row > label {
+  color: #e7e9ea;
+  font-size: 13px;
+}
+
+.delay-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.delay-input-wrap input[type="number"] {
+  width: 70px;
+  background: #1e2d3d;
+  color: #e7e9ea;
+  border: 1px solid #2f3336;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 13px;
+  text-align: right;
+}
+
+.delay-input-wrap input[type="number"]:focus {
+  border-color: #1d9bf0;
+  outline: none;
+}
+
+.delay-unit {
+  color: #71767b;
+  font-size: 13px;
+}
+
 .stats-section {
   padding: 10px 16px;
   color: #71767b;

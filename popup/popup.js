@@ -20,10 +20,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("displaySelect").addEventListener("change", onSettingChange);
   document.getElementById("hideUnknown").addEventListener("change", onSettingChange);
   document.getElementById("useApiFallback").addEventListener("change", onSettingChange);
+  document.getElementById("lookupDelay").addEventListener("change", onSettingChange);
   document.getElementById("countrySearch").addEventListener("input", onSearchInput);
   document.getElementById("resetBtn").addEventListener("click", onReset);
   document.getElementById("helpBtn").addEventListener("click", () => {
     chrome.tabs.create({ url: chrome.runtime.getURL("guide/guide.html") });
+  });
+
+  // Live-update delay if auto-adjusted by rate limiter
+  chrome.storage.onChanged.addListener((changes) => {
+    if (changes.settings?.newValue?.lookupDelay !== undefined) {
+      const newDelay = changes.settings.newValue.lookupDelay;
+      if (newDelay !== settings.lookupDelay) {
+        settings.lookupDelay = newDelay;
+        document.getElementById("lookupDelay").value = newDelay;
+      }
+    }
   });
 });
 
@@ -33,6 +45,7 @@ function renderSettings() {
   document.getElementById("displaySelect").value = settings.displayMode;
   document.getElementById("hideUnknown").checked = settings.hideUnknown;
   document.getElementById("useApiFallback").checked = settings.useApiFallback;
+  document.getElementById("lookupDelay").value = settings.lookupDelay ?? 200;
 }
 
 function renderCountryList(filter = "") {
@@ -52,6 +65,8 @@ function renderCountryList(filter = "") {
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
+    checkbox.id = "country-" + c.code;
+    checkbox.name = "country-" + c.code;
     checkbox.value = c.code;
     checkbox.checked = settings.countries.includes(c.code);
     checkbox.addEventListener("change", onCountryToggle);
@@ -86,6 +101,7 @@ function onSettingChange() {
   settings.displayMode = document.getElementById("displaySelect").value;
   settings.hideUnknown = document.getElementById("hideUnknown").checked;
   settings.useApiFallback = document.getElementById("useApiFallback").checked;
+  settings.lookupDelay = Math.max(0, parseInt(document.getElementById("lookupDelay").value, 10) || 0);
   saveSettings();
 }
 
@@ -103,7 +119,7 @@ function onSearchInput(e) { renderCountryList(e.target.value); }
 
 async function onReset() {
   if (!confirm("Reset all settings? Your country preferences will be cleared and onboarding will re-open.")) return;
-  await chrome.storage.local.remove(["onboardingComplete", "settings", "stats"]);
+  await chrome.storage.local.remove(["onboardingComplete", "settings", "stats", "userCache"]);
   window.close();
 }
 

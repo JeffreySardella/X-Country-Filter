@@ -2,44 +2,142 @@
 (function () {
   "use strict";
 
+  const DEBUG = true;
+  function log(...args) { if (DEBUG) console.log("[XCF content]", ...args); }
+
   const countryCache = new Map();
+  const screenNameToId = new Map();
   const pendingTweets = new Map();
+  const lookupRequested = new Set(); // screen_names sent for profile lookup
   let settings = null;
   let statsBuffer = { filtered: 0, processed: 0 };
 
   async function init() {
-    settings = await sendMessage({ type: "GET_SETTINGS" });
-    if (!settings) return;
+    log("init() starting");
+    try {
+      settings = await sendMessage({ type: "GET_SETTINGS" });
+    } catch (e) {
+      log("GET_SETTINGS failed:", e);
+    }
+    if (!settings) {
+      log("No settings found, using defaults");
+      settings = {
+        enabled: true, mode: "blocklist", displayMode: "hidden",
+        countries: [], hideUnknown: false, useApiFallback: false,
+        lookupDelay: 200
+      };
+    }
+    log("Settings loaded:", JSON.stringify(settings));
 
     window.addEventListener("message", onWindowMessage);
     chrome.runtime.onMessage.addListener(onExtensionMessage);
     startObserver();
     setInterval(flushStats, 30000);
+
+    // Send lookup delay setting to fetchHook
+    window.postMessage({ type: "XCF_SETTINGS", lookupDelay: settings.lookupDelay ?? 200 }, "*");
+
+    // Request any users buffered by fetchHook before we started listening
+    log("Requesting buffered users from fetchHook");
+    window.postMessage({ type: "XCF_REQUEST_BUFFER" }, "*");
+
+    // Initial scan of tweets already in the DOM
+    setTimeout(scanExistingTweets, 500);
+    log("init() complete — observer started");
+  }
+
+  function scanExistingTweets() {
+    const tweets = document.querySelectorAll('article[data-testid="tweet"]');
+    log("Initial DOM scan found", tweets.length, "existing tweets");
+    for (const tweet of tweets) {
+      if (!tweet.getAttribute("data-xcf-filtered")) {
+        processingQueue.push(tweet);
+      }
+    }
+    if (processingQueue.length > 0 && !rafPending) {
+      rafPending = true;
+      requestAnimationFrame(processQueue);
+    }
   }
 
   function onWindowMessage(event) {
     if (event.source !== window) return;
+    if (event.data?.type === "XCF_DELAY_UPDATED") {
+      const newDelay = event.data.lookupDelay;
+      log("Lookup delay auto-adjusted to", newDelay, "ms");
+      if (settings) settings.lookupDelay = newDelay;
+      chrome.storage.local.get("settings").then(data => {
+        const s = data.settings || settings;
+        s.lookupDelay = newDelay;
+        chrome.storage.local.set({ settings: s });
+      });
+      return;
+    }
     if (!event.data || event.data.type !== "XCF_USER_DATA") return;
 
     const users = event.data.users;
     if (!Array.isArray(users) || users.length === 0) return;
 
+    log("Received", users.length, "users from fetchHook:", users.map(u => u.screen_name + " (" + u.location + ")").join(", "));
+
     sendMessage({ type: "RESOLVE_USERS", users }).then(results => {
-      if (!results) return;
+      if (!results) { log("RESOLVE_USERS returned null"); return; }
 
+      log("Resolved users:", JSON.stringify(results));
+
+      let countryChanged = false;
       for (const [userId, country] of Object.entries(results)) {
-        countryCache.set(userId, country);
         const user = users.find(u => u.id_str === userId);
-        if (user?.screen_name) {
-          countryCache.set(user.screen_name.toLowerCase(), country);
+        const screenName = user?.screen_name?.toLowerCase();
+
+        // Check if country changed from a previous resolution
+        const prevCountry = countryCache.get(userId);
+        if (prevCountry && prevCountry !== country) {
+          log("Country updated:", screenName || userId, prevCountry, "→", country);
+          countryChanged = true;
         }
 
-        if (pendingTweets.has(userId)) {
-          for (const node of pendingTweets.get(userId)) {
-            if (node.isConnected) applyFilter(node, userId);
-          }
-          pendingTweets.delete(userId);
+        countryCache.set(userId, country);
+        if (screenName) {
+          countryCache.set(screenName, country);
+          screenNameToId.set(screenName, userId);
         }
+
+        // Check pending tweets by BOTH id_str and screen_name
+        const keysToCheck = [userId];
+        if (screenName) keysToCheck.push(screenName);
+
+        for (const key of keysToCheck) {
+          if (pendingTweets.has(key)) {
+            log("Processing", pendingTweets.get(key).size, "pending tweets for", key);
+            for (const node of pendingTweets.get(key)) {
+              if (node.isConnected) applyFilter(node, key);
+            }
+            pendingTweets.delete(key);
+          }
+        }
+      }
+
+      // If any user's country changed, reprocess visible tweets
+      if (countryChanged) {
+        log("Country data changed, reprocessing visible tweets");
+        reprocessAllTweets();
+      }
+
+      // Collect unknown users for proactive profile lookup
+      const toLookup = [];
+      for (const [userId, country] of Object.entries(results)) {
+        if (country !== "unknown") continue;
+        const user = users.find(u => u.id_str === userId);
+        const sn = user?.screen_name;
+        if (sn && !lookupRequested.has(sn.toLowerCase())) {
+          lookupRequested.add(sn.toLowerCase());
+          toLookup.push(sn);
+        }
+      }
+      if (toLookup.length > 0) {
+        log("Requesting profile lookup for", toLookup.length, "unknown users");
+        window.postMessage({ type: "XCF_LOOKUP_USERS", screenNames: toLookup }, "*");
       }
     });
   }
@@ -47,6 +145,7 @@
   function onExtensionMessage(message) {
     if (message.type === "SETTINGS_UPDATED") {
       settings = message.settings;
+      window.postMessage({ type: "XCF_SETTINGS", lookupDelay: settings.lookupDelay ?? 200 }, "*");
       reprocessAllTweets();
     }
   }
@@ -85,17 +184,21 @@
   function processQueue() {
     rafPending = false;
     const batch = processingQueue.splice(0);
+    log("Processing batch of", batch.length, "tweets");
 
     for (const tweet of batch) {
       if (!tweet.isConnected) continue;
       const userId = extractUserId(tweet);
-      if (!userId) continue;
+      if (!userId) { log("Could not extract userId from tweet node"); continue; }
 
       statsBuffer.processed++;
 
       if (countryCache.has(userId)) {
+        const country = countryCache.get(userId);
+        log("Cache hit:", userId, "→", country);
         applyFilter(tweet, userId);
       } else {
+        log("Cache miss:", userId, "→ added to pending");
         if (!pendingTweets.has(userId)) pendingTweets.set(userId, new Set());
         pendingTweets.get(userId).add(tweet);
       }
@@ -133,7 +236,10 @@
     const country = countryCache.get(userId);
     if (!country) return;
 
-    if (shouldFilterCountry(country)) {
+    const shouldFilter = shouldFilterCountry(country);
+    log("Filter check:", userId, "country=" + country, "mode=" + settings.mode, "countries=" + JSON.stringify(settings.countries), "→", shouldFilter ? "FILTER" : "SHOW");
+
+    if (shouldFilter) {
       if (settings.displayMode === "collapsed") {
         collapseTweet(tweetNode, country);
       } else {

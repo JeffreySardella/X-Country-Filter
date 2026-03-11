@@ -3,7 +3,7 @@
   "name": "X Country Filter",
   "version": "1.0.0",
   "description": "Filter X (Twitter) posts by account country — hide the noise, keep the signal.",
-  "permissions": ["storage", "activeTab"],
+  "permissions": ["storage", "activeTab", "alarms"],
   "host_permissions": ["*://x.com/*", "*://twitter.com/*"],
   "background": {
     "service_worker": "background.js",

@@ -1,8 +1,14 @@
 // background.js — Service Worker (MV3 module)
 import { resolveCountry } from "./utils/countryResolver.js";
 
+const DEBUG = true;
+function log(...args) { if (DEBUG) console.log("[XCF background]", ...args); }
+
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 const NOMINATIM_MIN_GAP_MS = 1100;
+const CACHE_VERSION = 2; // bump to invalidate stale cache
+
+log("Service worker loaded");
 
 // --- Onboarding ---
 
@@ -12,6 +18,14 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     if (!data.onboardingComplete) {
       chrome.tabs.create({ url: chrome.runtime.getURL("onboarding/onboarding.html") });
     }
+  }
+
+  // Clear stale cache when cache version changes
+  const data = await chrome.storage.local.get("cacheVersion");
+  if (data.cacheVersion !== CACHE_VERSION) {
+    log("Cache version changed, clearing userCache");
+    await chrome.storage.local.remove("userCache");
+    await chrome.storage.local.set({ cacheVersion: CACHE_VERSION });
   }
 });
 
@@ -43,6 +57,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 // --- User Resolution ---
 
 async function handleResolveUsers(users) {
+  log("Resolving", users.length, "users");
   const data = await chrome.storage.local.get("userCache");
   const cache = data.userCache || {};
   const settings = (await chrome.storage.local.get("settings")).settings || getDefaultSettings();
@@ -53,19 +68,25 @@ async function handleResolveUsers(users) {
   for (const user of users) {
     const userId = user.id_str;
     const cached = cache[userId];
-    if (cached && (now - cached.resolvedAt) < CACHE_TTL_MS) {
-      results[userId] = cached.country;
-    } else {
+    // Re-resolve if: no cache, cache expired, or cached as unknown but now have location
+    const needsResolve = !cached
+      || (now - cached.resolvedAt) >= CACHE_TTL_MS
+      || (cached.country === "unknown" && user.location);
+    if (needsResolve) {
       toResolve.push(user);
+    } else {
+      results[userId] = cached.country;
+      log("Cache hit:", user.screen_name, "→", cached.country);
     }
   }
 
   for (const user of toResolve) {
     let country = resolveCountry(user.location, user.lang);
+    log("Resolved:", user.screen_name, "location=\"" + user.location + "\" lang=" + user.lang, "→", country);
 
     if (country === "unknown" && user.location && settings.useApiFallback) {
       const apiResult = await nominatimLookup(user.location);
-      if (apiResult) country = apiResult;
+      if (apiResult) { country = apiResult; log("Nominatim fallback:", user.location, "→", country); }
     }
 
     cache[user.id_str] = { country, resolvedAt: now };
@@ -164,7 +185,8 @@ async function handleUpdateStats(incomingStats) {
 function getDefaultSettings() {
   return {
     enabled: true, mode: "blocklist", displayMode: "hidden",
-    countries: [], hideUnknown: false, useApiFallback: false
+    countries: [], hideUnknown: false, useApiFallback: false,
+    lookupDelay: 200
   };
 }
 

@@ -45,12 +45,19 @@
     <section class="options-section">
       <label class="checkbox-row">
         <input type="checkbox" id="hideUnknown">
-        <span>Hide unknown accounts</span>
+        <span>Hide unknown accounts <small style="color:#71767b;display:block;margin-top:2px;">Many accounts don't set a location — this may filter a lot of posts</small></span>
       </label>
       <label class="checkbox-row">
         <input type="checkbox" id="useApiFallback">
         <span>Use online lookup for unrecognized locations</span>
       </label>
+      <div class="delay-row">
+        <label for="lookupDelay">Lookup delay:</label>
+        <div class="delay-input-wrap">
+          <input type="number" id="lookupDelay" min="0" max="10000" step="10" value="200">
+          <span class="delay-unit">ms</span>
+        </div>
+      </div>
     </section>
 
     <section class="stats-section">
